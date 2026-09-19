@@ -1,0 +1,101 @@
+[gd_scene load_steps=12 format=3 uid="uid://causal_world_model_main"]
+
+[ext_resource type="Script" path="res://scripts/world/CausalWorldModel.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/ui/HUD.gd" id="2"]
+
+; ── Meshes ────────────────────────────────────────────────────────────────────
+[sub_resource type="SphereMesh" id="SphereMesh_1"]
+radius = 0.22
+height = 0.44
+radial_segments = 32
+rings = 16
+
+[sub_resource type="BoxMesh" id="BoxMesh_floor"]
+size = Vector3(26.0, 0.12, 22.0)
+
+[sub_resource type="CylinderMesh" id="CylMesh_platform"]
+top_radius = 3.5
+bottom_radius = 3.5
+height = 0.12
+radial_segments = 8
+
+; ── Environment ───────────────────────────────────────────────────────────────
+[sub_resource type="Environment" id="Env_1"]
+background_mode = 1
+background_color = Color(0.012, 0.018, 0.035, 1)
+ambient_light_color = Color(0.08, 0.12, 0.22, 1)
+ambient_light_energy = 0.35
+glow_enabled = true
+glow_intensity = 1.2
+glow_bloom = 0.12
+glow_blend_mode = 3
+glow_levels/1 = false
+glow_levels/2 = false
+glow_levels/3 = true
+glow_levels/4 = true
+glow_levels/5 = false
+glow_levels/6 = false
+glow_levels/7 = false
+ssao_enabled = true
+ssao_radius = 1.2
+ssao_intensity = 2.0
+tonemap_mode = 3
+tonemap_exposure = 1.1
+fog_enabled = true
+fog_density = 0.006
+fog_light_color = Color(0.05, 0.08, 0.18, 1)
+
+; ── Scene Tree ────────────────────────────────────────────────────────────────
+[node name="Main" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Env_1")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866, -0.354, 0.354, 0, 0.707, 0.707, -0.5, -0.612, 0.612, 0, 10, 0)
+light_color = Color(0.5, 0.65, 1.0, 1)
+light_energy = 0.25
+shadow_enabled = true
+
+[node name="CameraPivot" type="Node3D" parent="."]
+position = Vector3(0, 0, 0)
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
+transform = Transform3D(1, 0, 0, 0, 0.866, 0.5, 0, -0.5, 0.866, 0, 8.0, 14.0)
+fov = 62.0
+near = 0.1
+far = 200.0
+
+[node name="DAGRoot" type="Node3D" parent="."]
+; CausalNode3D and CausalEdge3D instances are added here at runtime
+; by CausalWorldModel.gd::_build_dag_nodes() / _build_dag_edges()
+
+[node name="RoomGeometry" type="Node3D" parent="."]
+; Procedurally built at runtime by CausalWorldModel.gd::_build_room()
+
+[node name="HUD" type="CanvasLayer" parent="."]
+layer = 2
+script = ExtResource("2")
+
+; All HUD sub-panels are built procedurally by HUD.gd::_build_ui()
+; No child nodes needed in .tscn — layout is code-driven
+
+[node name="OmniLight_Center" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.0, 0)
+light_color = Color(0.25, 0.45, 1.0, 1)
+light_energy = 0.45
+omni_range = 18.0
+shadow_enabled = false
+
+[node name="OmniLight_Left" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.0, 3.5, 0)
+light_color = Color(0.2, 0.55, 1.0, 1)
+light_energy = 0.3
+omni_range = 12.0
+
+[node name="OmniLight_Right" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.0, 3.5, 0)
+light_color = Color(0.2, 0.55, 1.0, 1)
+light_energy = 0.3
+omni_range = 12.0
